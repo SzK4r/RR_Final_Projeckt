@@ -1,1 +1,100 @@
-New rmd file
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+Loading required packages
+```{r}
+library(rstudioapi)
+library(tidyverse)
+library(RColorBrewer)
+```
+
+Loading the data
+```{r}
+current_path <- rstudioapi::getActiveDocumentContext()$path
+current_path <- path.expand(current_path)
+current_path <- dirname(current_path)
+to_csv <- file.path(current_path, "Data ", "Survey_AI.csv")
+to_csv
+```
+
+```{r}
+data <- read.csv(to_csv)
+```
+
+Checking the structure of the data
+
+```{r}
+str(data)
+```
+
+Deleting character variables (they're only as comments for the variables for Q2.1-Q2.5 and Q6.1-Q6.7)
+
+```{r}
+data <- subset(data, select = -c(Q2.AI_sources, Q6.Domains, ID))
+```
+
+Changing all variables to numeric
+
+```{r}
+data <- mutate_all(data, as.numeric)
+```
+
+Checking for missing values
+
+```{r}
+print(missing_values <- colSums(is.na(data)))
+```
+
+No missing values found, so we can proceed with the barplot of students' knowledge
+
+```{r}
+custom_colors <- brewer.pal(10, "Spectral")
+
+fig1 <- ggplot(data, aes(x = Q1.AI_knowledge)) +
+  geom_bar(aes(fill = factor(Q1.AI_knowledge)), color = "black") +
+  scale_fill_manual(values = custom_colors) +
+  xlab("AI knowledge rating") +
+  ylab("Number of responses") +
+  ggtitle("A countplot of AI knowledge ratings") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 16, face = "bold"),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10),
+        legend.title = element_blank(),
+        legend.position = "none")
+
+print(fig1)
+```
+
+Creating data frame with sources of students' knowledge with their counts and producing an appropriate plot
+
+
+```{r}
+source_names <- c("Internet", "Books/Papers", "Social Media", "Discussions", "Not Informed")
+source_counts <- sapply(data[, c("Q2.1.Internet", "Q2.2.Books.Papers", "Q2.3.Social_media", "Q2.4.Discussions", "Q2.5.NotInformed")], function(col) sum(col == 1))
+
+source_data <- data.frame(Source = source_names, Count = source_counts)
+
+source_data$Proportion <- source_data$Count / sum(source_data$Count)
+
+```
+
+```{r}
+custom_colors <- brewer.pal(5, "Spectral")
+fig2 <- ggplot(source_data, aes(x = reorder(Source, -Proportion), y = Proportion, fill = Source)) +
+  geom_bar(stat = "identity", color = "black") +
+  labs(x = "Source", y = "Proportion", fill = "Source") +
+  ggtitle("Proportion of Students Using Each Source") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(size = 16, face = "bold"),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10),
+        legend.title = element_text(size = 12),
+        legend.position = "right") +
+  scale_fill_manual(values = custom_colors)
+
+print(fig2)
+```

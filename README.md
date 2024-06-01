@@ -52,5 +52,5 @@ The main list of tasks that we wanted to accomplish is outlined below.
 
 ## Team members
 
-Antoni Piotrowski
-Szymon Karkoszka
+- Antoni Piotrowski
+- Szymon Karkoszka
