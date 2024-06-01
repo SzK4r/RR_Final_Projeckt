@@ -8,8 +8,8 @@ The dataset utilized in this study encompasses the responses obtained from a sur
 
 This dataset comprises a total of 96 observations, each representing a unique case or participant. Additionally, the dataset contains 36 variables, which encompass the different characteristics or attributes under investigation.
 
-Dataset available under the link: 
-#href https://www.kaggle.com/datasets/gianinamariapetrascu/survey-on-students-perceptions-of-ai-in-education 
+Dataset available under the 
+https://www.kaggle.com/datasets/gianinamariapetrascu/survey-on-students-perceptions-of-ai-in-education 
 
 ## Scientific Paper
 
