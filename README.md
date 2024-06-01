@@ -2,7 +2,7 @@
 
 The scientific paper which results we chose to reproduce was **"Technical and Humanities Students’ Perspectives on the Development and Sustainability of Artificial Intelligence (AI)l" by Vasile Gherheș and Ciprian Obrad (2018)**. 
 
-##Data
+## Data
 
 The dataset utilized in this study encompasses the responses obtained from a survey administered to undergraduate students in their 2nd and 3rd years of study at the Faculty of Cybernetics, Statistics, and Economic Informatics. The survey was conducted online and disseminated through social media groups. Its objective was to acquire insights into students' perceptions regarding the role of artificial intelligence (AI) in the domain of education.
 
@@ -50,7 +50,7 @@ The main list of tasks that we wanted to accomplish is outlined below.
 - [ ] Exporting results to a Quarto html report
 
 
-##Team members
+## Team members
 
 Antoni Piotrowski
 Szymon Karkoszka
