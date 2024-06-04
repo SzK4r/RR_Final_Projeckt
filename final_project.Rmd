@@ -1,4 +1,19 @@
 ---
+title: 'Reproducible Research Project: Technical and Humanities Students’ Perspectives on the Development and Sustainability of Artificial Intelligence (AI)'
+author: 'Szymon Karkoszka, Antoni Piotrowski'
+format:
+  html:
+    code-fold: true
+    toc: true
+    toc-depth: 2
+    toc-expand: 1
+    toc-title: Contents
+    toc-location: body
+    smooth-scroll: true
+    theme:
+      light: flatly
+      dark: darkly
+title-block-banner: true
 output:
   pdf_document: default
   html_document: default
@@ -8,14 +23,31 @@ Loading required packages
 library(rstudioapi)
 library(tidyverse)
 library(RColorBrewer)
+library(reshape2)
+library(ggplot2)
+library(kableExtra)
 ```
+
+1. Why it is important to reproduce the paper — problem description and topic importance
+
+The perception of students on AI in education is a crucial topic to analyze from an economic standpoint. The incorporation of AI in the education sector has been increasing in recent years, with the emergence of smart classrooms and personalized learning platforms. The potential benefits of AI in education include improved learning outcomes, increased accessibility, and efficiency gains in educational delivery.
+Understanding the perceptions of students towards AI in education is vital to inform policies and investment decisions in the education sector. The analysis of student perceptions can provide insights into the potential barriers and facilitators to AI adoption in education, as well as inform strategies for the development of AI technologies that are sensitive to student needs and concerns.
+
+This paper aims to analyze students’ perception on the AI in Education. Therfore we decide to examine the differences between the studies. 
+
+2. Data 
+In terms of the comparison, the data we found are excellent as they both compare student and both from Romania. Unfortunately, our data set is *10 times smaller* but much more informative. Our data are also much more up to date and we can say that we compare data between two "AI Waves" — one from 2017 and another from 2022. 
+
+The dataset utilized in this study encompasses the responses obtained from a survey administered to undergraduate students in their 2nd and 3rd years of study at the Faculty of Cybernetics, Statistics, and Economic Informatics. The survey was conducted online and disseminated through social media groups. Its objective was to acquire insights into students' perceptions regarding the role of artificial intelligence (AI) in the domain of education.
+
+This dataset comprises a total of 96 observations, each representing a unique case or participant. Additionally, the dataset contains 36 variables, which encompass the different characteristics or attributes under investigation.
 
 Loading the data
 ```{r}
 current_path <- rstudioapi::getActiveDocumentContext()$path
 current_path <- path.expand(current_path)
 current_path <- dirname(current_path)
-to_csv <- file.path(current_path, "Data ", "Survey_AI.csv")
+to_csv <- file.path(current_path, "Data", "Survey_AI.csv")
 to_csv
 ```
 
@@ -46,6 +78,14 @@ Checking for missing values
 ```{r}
 print(missing_values <- colSums(is.na(data)))
 ```
+Creating data frame with sources of students' knowledge with their counts and producing an appropriate plot
+
+Comparison with the paper:
+A first perspective they identify how well the respondents understood the concept of artificial intelligence. Their results show that 84.6% consider that they know what artificial intelligence means, whereas 12% claim that they do not know what the concept means. At the same time, 3.4% answered “I don’t know/I won’t answer”
+
+The highest percentage belongs to the category of those who believe that they have an average awareness of artificial intelligence (36.1%). By referring to this average category, while cumulating two other answers (very well informed, 2.4%, and well informed, 16.8%), which represent the number of those with an above-average level of awareness, as well as cumulating the remaining two answers (poorly informed, 35%, and very poorly informed, 9.7%) which represent the category of those with a below-average level of awareness, showing that the number of those who consider themselves less informed is greater than the category of those who believe that they are well informed on the subject (44.7% as opposed to 19.2%).
+
+// weź wrzuć tutaj jakiś plot w porównaniu z naszymi danymi. 
 
 No missing values found, so we can proceed with the barplot of students' knowledge
 
@@ -68,7 +108,7 @@ fig1 <- ggplot(data, aes(x = Q1.AI_knowledge)) +
 print(fig1)
 ```
 
-Creating data frame with sources of students' knowledge with their counts and producing an appropriate plot
+
 
 
 ```{r}
@@ -98,3 +138,140 @@ fig2 <- ggplot(source_data, aes(x = reorder(Source, -Proportion), y = Proportion
 
 print(fig2)
 ```
+########## correlations
+
+# Select the relevant columns from the data frame
+
+```{r}
+selected_columns <- c("Q2.1.Internet", "Q2.2.Books.Papers", "Q2.3.Social_media", "Q2.4.Discussions", "Q2.5.NotInformed")
+selected_data <- data[, selected_columns]
+
+```
+
+# Calculate the correlation matrix and round the values
+
+```{r}
+correlation_matrix <- round(cor(selected_data), 2)
+correlation_data <- melt(correlation_matrix)
+
+print(correlation_data)
+
+ggplot(data = correlation_data, aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(low = "red", mid = "white", high = "blue", midpoint = 0) +
+  theme_minimal() +
+  labs(title = "Correlation Heatmap", x = "", y = "") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+
+```
+
+Relation with student's knowledge about AI
+
+```{r}
+# Define the columns vector
+columns <- c("Q2.1.Internet", "Q2.2.Books.Papers", "Q2.3.Social_media", "Q2.4.Discussions", "Q2.5.NotInformed")
+
+# Create an empty list to store the results
+results <- list()
+
+# Iterate over the columns
+for (i in columns) {
+  x1 <- mean(data[data[, i] == 0, "Q1.AI_knowledge"], na.rm = TRUE)
+  x2 <- mean(data[data[, i] == 1, "Q1.AI_knowledge"], na.rm = TRUE)
+  change <- round(x2 - x1, 2)
+  results[[i]] <- c(x1, x2, change)
+}
+
+# Create a data frame from the results list
+data2 <- data.frame(t(as.data.frame(results)))
+colnames(data2) <- c("No - MeanQ1", "Yes - MeanQ1", "Absolute Change")
+row.names(data2) <- columns
+
+# Print the resulting data frame
+print(data2)
+
+```
+
+```{r}
+# Define the column names and labels
+columns <- c('Q3.1.AI_dehumanization', 'Q3.2.Job_replacement', 'Q3.3.Problem_solving', 'Q3.4.AI_rulling_society',
+             'Q4.1.AI_costly', 'Q4.2.Economic_crisis', 'Q4.3.Economic_growth', 'Q4.4.Job_loss')
+labels <- c('AI encourages dehumanization', 'Robots will replace people at work', 'AI helps to solve many problems in society',
+            'AI will rule society', 'Machinery using AI is very expensive and resource-intensive to build and maintain',
+            'AI will lead to a global economic crisis', 'AI will help global economic growth', 'AI leads to job losses')
+
+# Subset the dataframe with the relevant columns
+data_subset <- data[, columns]
+
+str(data)
+# Reshape the data for plotting
+data_subset_long <- reshape2::melt(data_subset)
+data_subset_long$variable <- factor(data_subset_long$variable, levels = columns, labels = labels)
+
+str(data_subset_long )
+my_palette <- brewer.pal(8, "Set2")
+# Create a violin plot
+ggplot(data_subset_long, aes(x = variable, y = value, fill = variable)) +
+  geom_violin(color = "black", alpha = 0.8, scale = "count", trim = FALSE) +
+  scale_fill_manual(values = my_palette) +
+  labs(x = "Statement", y = "Agreement Level", fill = "") +
+  ggtitle("Violin Plot of Questions 3 & 4 Statements versus Responses") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(hjust = 0.5),
+        legend.position = "none",
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank())
+
+```
+
+```{r}
+######### standard deviations in answers
+
+# Calculate standard deviations
+standard_deviations <- sapply(columns, function(column) {
+  sd(data[[column]])
+})
+
+# Convert standard deviations to a data frame
+sd_data <- data.frame(variable = names(standard_deviations),
+                      sd = standard_deviations)
+
+# Sort the data frame by standard deviation values
+sd_data <- sd_data[order(sd_data$sd), ]
+
+# Create a styled table
+styled_table <- sd_data %>%
+  kable(col.names = c("Variable", "Standard Deviation")) %>%
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
+
+styled_table
+
+```
+```{r}
+# Extract the desired values and labels from the dataframe
+feelings <- c('Curiosity', 'Fear', 'Indifference', 'Trust')
+# Adjust the indices accordingly
+str(data$Q5.Feelings)
+
+print(data$Q5.Feelings)
+counts <- table(data$Q5.Feelings)
+# Define custom colors for the pie slices
+custom_colors <- c('#F8766D', '#00BA38', '#619CFF', '#FFB028')
+
+# Create the pie chart with enhanced appearance
+pie(counts, labels = feelings, col = custom_colors, border = 'white',
+    init.angle = 90, clockwise = TRUE)
+legend("right", legend = feelings, fill = custom_colors,
+       bty = "n", cex = 0.8)
+
+```
+// Weź spoltuj jeszcze to Q12.Gender: Gender of the student (1 = Male, 2 = Female) i poczytaj ten paper tam co jest, bo reszty to nie ma co zmieniać się bawić. Można jeszcze wiesz zrobić jakoś, że tyle male dało, a tyle female, ale to takie  odaj te comparission tych danych do co oni mają. zrobimy korelacje, ładnie to się opisze, zrobi się prezkę i będzie gitówka myślę. 
+
+```{r}
+
+```
+
+
+
