@@ -36,6 +36,7 @@ library(RColorBrewer)
 library(reshape2)
 library(ggplot2)
 library(kableExtra)
+library(scales)
 ```
 
 2. Data 
@@ -270,11 +271,152 @@ legend("right", legend = feelings, fill = custom_colors,
        bty = "n", cex = 0.8)
 
 ```
-// Weź spoltuj jeszcze to Q12.Gender: Gender of the student (1 = Male, 2 = Female) i poczytaj ten paper tam co jest, bo reszty to nie ma co zmieniać się bawić. Można jeszcze wiesz zrobić jakoś, że tyle male dało, a tyle female, ale to takie  odaj te comparission tych danych do co oni mają. zrobimy korelacje, ładnie to się opisze, zrobi się prezkę i będzie gitówka myślę. 
+
 
 ```{r}
+data3 <- data[c('Q1.AI_knowledge', 'Q3.2.Job_replacement', 'Q3.3.Problem_solving', 'Q3.4.AI_rulling_society', 'Q12.Gender')]
+
+data3 <- data3 %>%
+  mutate(Q1.AI_knowledge = case_when(
+    Q1.AI_knowledge %in% c(1, 2) ~ "very poorly informed/uninformed",
+    Q1.AI_knowledge %in% c(3, 4) ~ "poorly informed",
+    Q1.AI_knowledge %in% c(5, 6) ~ "sufficiently informed",
+    Q1.AI_knowledge %in% c(7, 8) ~ "well informed",
+    Q1.AI_knowledge %in% c(9, 10) ~ "very well informed"
+  ),
+  Q12.Gender = case_when(
+    Q12.Gender == 1 ~ 'F',
+    Q12.Gender == 2 ~ 'M',
+    TRUE ~ as.character(Q12.Gender)
+  ),
+  Q3.2.Job_replacement = case_when(
+    Q3.2.Job_replacement %in% c(1) ~ "Strongly Disagree",
+    Q3.2.Job_replacement %in% c(2) ~ "Partially Disagree",
+    Q3.2.Job_replacement %in% c(3) ~ "Neutral",
+    Q3.2.Job_replacement %in% c(4) ~ "Partially Agree",
+    Q3.2.Job_replacement %in% c(5) ~ "Fully Agree"
+  ),
+  Q3.3.Problem_solving = case_when(
+    Q3.3.Problem_solving %in% c(1) ~ "Strongly Disagree",
+    Q3.3.Problem_solving %in% c(2) ~ "Partially Disagree",
+    Q3.3.Problem_solving %in% c(3) ~ "Neutral",
+    Q3.3.Problem_solving %in% c(4) ~ "Partially Agree",
+    Q3.3.Problem_solving %in% c(5) ~ "Fully Agree"
+  ),
+  Q3.4.AI_rulling_society = case_when(
+    Q3.4.AI_rulling_society %in% c(1) ~ "Strongly Disagree",
+    Q3.4.AI_rulling_society %in% c(2) ~ "Partially Disagree",
+    Q3.4.AI_rulling_society %in% c(3) ~ "Neutral",
+    Q3.4.AI_rulling_society %in% c(4) ~ "Partially Agree",
+    Q3.4.AI_rulling_society %in% c(5) ~ "Fully Agree"))
 
 ```
 
+```{r}
+data3 <- data3 %>%
+  mutate(Q1.AI_knowledge = factor(Q1.AI_knowledge, levels = c("very poorly informed/uninformed", "poorly informed", "sufficiently informed", "well informed", "very well informed"), ordered = TRUE))
+
+ordered_levels <- c("Strongly Disagree", "Partially Disagree", "Neutral", "Partially Agree", "Fully Agree")
+
+data3 <- data3 %>%
+  mutate(Q3.2.Job_replacement = factor(Q3.2.Job_replacement, levels = ordered_levels, ordered = TRUE))
+data3 <- data3 %>%
+  mutate(Q3.3.Problem_solving = factor(Q3.3.Problem_solving, levels = ordered_levels, ordered = TRUE))
+data3 <- data3 %>%
+  mutate(Q3.4.AI_rulling_society = factor(Q3.4.AI_rulling_society, levels = ordered_levels, ordered = TRUE))
+```
 
 
+```{r}
+knowledge_summary <- data3 %>%
+  count(Q1.AI_knowledge) %>%
+  rename(Category = Q1.AI_knowledge, Count = n) %>%
+  mutate(Percentage = Count / sum(Count))
+
+ggplot(knowledge_summary, aes(x = "", y = Percentage, fill = Category)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+  labs(title = "Distribution of AI Knowledge Levels",
+       x = NULL, y = NULL, fill = "AI Knowledge Level") +
+  theme_minimal() +
+  theme(axis.text.x = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid = element_blank(),
+        plot.title = element_text(size = 16, face = "bold")) +
+  scale_fill_brewer(palette = "RdYlGn") + 
+  geom_text(aes(label = percent(Percentage)), position = position_stack(vjust = 0.5))
+```
+```{r, echo=TRUE,warning=FALSE,message=FALSE,error=FALSE}
+table_data <- data3 %>%
+  group_by(Q12.Gender, Q1.AI_knowledge) %>%
+  summarise(Count = n()) %>%
+  mutate(Percentage = Count / sum(Count) * 100) %>%
+  arrange(Q12.Gender, Q1.AI_knowledge)
+
+pivot_table <- table_data %>%
+  select(-Count) %>%
+  pivot_wider(names_from = Q12.Gender, values_from = Percentage, values_fill = list(Percentage = 0))
+
+pivot_table <- pivot_table %>%
+  mutate(across(where(is.numeric), ~ paste0(round(.x, 1), "%")))
+
+pivot_table %>% 
+  kable( format = "markdown", col.names = c("AI Knowledge Level", "Female (%)", "Male (%)")) %>% 
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
+```
+```{r, echo=TRUE,warning=FALSE,message=FALSE,error=FALSE}
+table_data2 <- data3 %>%
+  group_by(Q12.Gender, Q3.2.Job_replacement) %>%
+  summarise(Count = n()) %>%
+  mutate(Percentage = Count / sum(Count) * 100) %>%
+  arrange(Q12.Gender, Q3.2.Job_replacement)
+
+pivot_table2 <- table_data2 %>%
+  select(-Count) %>%
+  pivot_wider(names_from = Q12.Gender, values_from = Percentage, values_fill = list(Percentage = 0))
+
+pivot_table2 <- pivot_table2 %>%
+  mutate(across(where(is.numeric), ~ paste0(round(.x, 1), "%")))
+
+pivot_table2 %>% 
+  kable( format = "markdown", col.names = c("Replacing the humans and jobs by gender", "Female (%)", "Male (%)")) %>% 
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
+```
+
+```{r, echo=TRUE,warning=FALSE,message=FALSE,error=FALSE}
+table_data3 <- data3 %>%
+  group_by(Q12.Gender, Q3.4.AI_rulling_society) %>%
+  summarise(Count = n()) %>%
+  mutate(Percentage = Count / sum(Count) * 100) %>%
+  arrange(Q12.Gender, Q3.4.AI_rulling_society)
+
+pivot_table3 <- table_data3 %>%
+  select(-Count) %>%
+  pivot_wider(names_from = Q12.Gender, values_from = Percentage, values_fill = list(Percentage = 0))
+
+pivot_table3 <- pivot_table3 %>%
+  mutate(across(where(is.numeric), ~ paste0(round(.x, 1), "%")))
+
+pivot_table3 %>% 
+  kable( format = "markdown", col.names = c("AI will rull society/destroy humanity", "Female (%)", "Male (%)")) %>% 
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
+```
+
+```{r, echo=TRUE,warning=FALSE,message=FALSE,error=FALSE}
+table_data4 <- data3 %>%
+  group_by(Q12.Gender, Q3.3.Problem_solving) %>%
+  summarise(Count = n()) %>%
+  mutate(Percentage = Count / sum(Count) * 100) %>%
+  arrange(Q12.Gender, Q3.3.Problem_solving)
+
+pivot_table4 <- table_data4 %>%
+  select(-Count) %>%
+  pivot_wider(names_from = Q12.Gender, values_from = Percentage, values_fill = list(Percentage = 0))
+
+pivot_table4 <- pivot_table4 %>%
+  mutate(across(where(is.numeric), ~ paste0(round(.x, 1), "%")))
+
+pivot_table3 %>% 
+  kable( format = "markdown", col.names = c("AI helps to solve many problems in society", "Female (%)", "Male (%)")) %>% 
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
+```
