@@ -1,7 +1,7 @@
 ---
 title: 'Reproducible Research Project: Technical and Humanities Students’ Perspectives on the Development and Sustainability of Artificial Intelligence (AI)'
 author: 'Szymon Karkoszka, Antoni Piotrowski'
-format:
+format: 
   html:
     code-fold: true
     toc: true
@@ -15,9 +15,19 @@ format:
       dark: darkly
 title-block-banner: true
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
+
+
+1. Why it is important to reproduce the paper — problem description and topic importance
+
+The perception of students on AI in education is a crucial topic to analyze from an economic standpoint. The incorporation of AI in the education sector has been increasing in recent years, with the emergence of smart classrooms and personalized learning platforms. The potential benefits of AI in education include improved learning outcomes, increased accessibility, and efficiency gains in educational delivery.
+Understanding the perceptions of students towards AI in education is vital to inform policies and investment decisions in the education sector. The analysis of student perceptions can provide insights into the potential barriers and facilitators to AI adoption in education, as well as inform strategies for the development of AI technologies that are sensitive to student needs and concerns.
+
+This paper aims to analyze students’ perception on the AI in Education. Therfore we decide to examine the differences between the studies. 
+
+
 Loading required packages
 ```{r}
 library(rstudioapi)
@@ -27,13 +37,6 @@ library(reshape2)
 library(ggplot2)
 library(kableExtra)
 ```
-
-1. Why it is important to reproduce the paper — problem description and topic importance
-
-The perception of students on AI in education is a crucial topic to analyze from an economic standpoint. The incorporation of AI in the education sector has been increasing in recent years, with the emergence of smart classrooms and personalized learning platforms. The potential benefits of AI in education include improved learning outcomes, increased accessibility, and efficiency gains in educational delivery.
-Understanding the perceptions of students towards AI in education is vital to inform policies and investment decisions in the education sector. The analysis of student perceptions can provide insights into the potential barriers and facilitators to AI adoption in education, as well as inform strategies for the development of AI technologies that are sensitive to student needs and concerns.
-
-This paper aims to analyze students’ perception on the AI in Education. Therfore we decide to examine the differences between the studies. 
 
 2. Data 
 In terms of the comparison, the data we found are excellent as they both compare student and both from Romania. Unfortunately, our data set is *10 times smaller* but much more informative. Our data are also much more up to date and we can say that we compare data between two "AI Waves" — one from 2017 and another from 2022. 
