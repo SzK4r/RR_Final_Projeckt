@@ -37,6 +37,10 @@ library(reshape2)
 library(ggplot2)
 library(kableExtra)
 library(scales)
+library(dplyr)
+library(tidyr)
+library(knitr)
+library(kableExtra)
 ```
 
 2. Data 
@@ -148,7 +152,7 @@ print(fig2)
 
 ```{r}
 selected_columns <- c("Q2.1.Internet", "Q2.2.Books.Papers", "Q2.3.Social_media", "Q2.4.Discussions", "Q2.5.NotInformed")
-selected_data <- data[, selected_columns]
+selected_data <- data$Q1.AI_knowledge[, selected_columns]
 
 ```
 
@@ -198,36 +202,36 @@ print(data2)
 
 ```{r}
 # Define the column names and labels
-columns <- c('Q3.1.AI_dehumanization', 'Q3.2.Job_replacement', 'Q3.3.Problem_solving', 'Q3.4.AI_rulling_society',
-             'Q4.1.AI_costly', 'Q4.2.Economic_crisis', 'Q4.3.Economic_growth', 'Q4.4.Job_loss')
+colnames(data) <- c('Q3.1.AI_dehumanization', 'Q3.2.Job_replacement', 'Q3.3.Problem_solving', 'Q3.4.AI_rulling_society',
+                    'Q4.1.AI_costly', 'Q4.2.Economic_crisis', 'Q4.3.Economic_growth', 'Q4.4.Job_loss')
 labels <- c('AI encourages dehumanization', 'Robots will replace people at work', 'AI helps to solve many problems in society',
-            'AI will rule society', 'Machinery using AI is very expensive and resource-intensive to build and maintain',
+            'AI will rule society', 'Machinery using AI is very expensive',
             'AI will lead to a global economic crisis', 'AI will help global economic growth', 'AI leads to job losses')
 
-# Subset the dataframe with the relevant columns
-data_subset <- data[, columns]
-
-str(data)
 # Reshape the data for plotting
-data_subset_long <- reshape2::melt(data_subset)
-data_subset_long$variable <- factor(data_subset_long$variable, levels = columns, labels = labels)
+data_subset_long <- melt(data)
+names(data_subset_long) <- c("variable", "value")
+data_subset_long$variable <- factor(data_subset_long$variable, levels = colnames(data), labels = labels)
 
-str(data_subset_long )
+# Create a color palette
 my_palette <- brewer.pal(8, "Set2")
+
 # Create a violin plot
-ggplot(data_subset_long, aes(x = variable, y = value, fill = variable)) +
-  geom_violin(color = "black", alpha = 0.8, scale = "count", trim = FALSE) +
+p <- ggplot(data_subset_long, aes(x = variable, y = value, fill = variable)) +
+  geom_violin(trim = FALSE, color = "black", alpha = 0.8) +
   scale_fill_manual(values = my_palette) +
-  labs(x = "Statement", y = "Agreement Level", fill = "") +
-  ggtitle("Violin Plot of Questions 3 & 4 Statements versus Responses") +
+  labs(title = "Violin Plot of Questions 3 & 4 Statements versus Responses",
+       x = "Statement", y = "Agreement Level") +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        plot.title = element_text(hjust = 0.5),
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
+        plot.title = element_text(hjust = 0.5, size = 14),
         legend.position = "none",
         panel.grid.major.y = element_blank(),
         panel.grid.minor = element_blank(),
         panel.border = element_blank())
 
+# Print the plot
+print(p)
 ```
 
 ```{r}
@@ -254,22 +258,78 @@ styled_table
 
 ```
 ```{r}
+
 # Extract the desired values and labels from the dataframe
 feelings <- c('Curiosity', 'Fear', 'Indifference', 'Trust')
-# Adjust the indices accordingly
+# Assuming that data$Q5.Feelings is your vector of feelings
 str(data$Q5.Feelings)
 
 print(data$Q5.Feelings)
 counts <- table(data$Q5.Feelings)
+
 # Define custom colors for the pie slices
 custom_colors <- c('#F8766D', '#00BA38', '#619CFF', '#FFB028')
 
+# Calculate percentages
+percentages <- round(counts / sum(counts) * 100, 1)
+
+# Labels with percentages
+labels <- paste(percentages, "%\n", feelings, sep="")
+
 # Create the pie chart with enhanced appearance
-pie(counts, labels = feelings, col = custom_colors, border = 'white',
-    init.angle = 90, clockwise = TRUE)
+pie(counts, labels = labels, col = custom_colors, border = 'white', 
+    init.angle = 90, clockwise = TRUE, main = "Students' Feelings about the Development of AI")
+
+# Add a legend
 legend("right", legend = feelings, fill = custom_colors,
        bty = "n", cex = 0.8)
 
+```
+```{r}
+# Load necessary libraries
+library(plotly)
+
+# Data from the image
+categories <- c("confused", "indifferent", "optimistic", "enthusiastic", "concerned")
+percentages <- c(26.6, 10.3, 28.2, 11.2, 23.7)
+values <- percentages / 100 * sum(percentages)  # Assuming total sum of percentages as a whole
+
+# Create a dataframe
+data <- data.frame(categories, values)
+
+# Create the pie chart
+fig <- plot_ly(data, labels = ~categories, values = ~values, type = 'pie',
+               textinfo = 'label+percent',
+               insidetextorientation = 'radial',
+               marker = list(colors = c('#FF7F0E', '#1F77B4', '#FFBB78', '#AEC7E8', '#2CA02C')))
+
+# Enhance the layout
+fig <- fig %>% layout(title = 'Students perception of AI',
+                      showlegend = TRUE,
+                      xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                      yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+# Render the plot
+fig
+```
+```{r}
+feelings <- c("Curiosity", "Fear", "Indifference", "Trust")
+percentages <- c(68.1, 13.2, 11, 7.7)
+values <- percentages / 100 * sum(percentages)  # Assuming total sum of percentages as a whole
+
+# Define custom colors for the pie slices
+custom_colors <- c('#F8766D', '#00BA38', '#619CFF', '#FFB028')
+
+# Labels with percentages
+labels <- paste(percentages, "% ", feelings, sep="")
+
+# Create the pie chart with enhanced appearance
+pie(values, labels = labels, col = custom_colors, border = 'white', 
+    init.angle = 90, clockwise = TRUE, main = "Students' Feelings about the Development of AI")
+
+# Optionally, add a legend if required
+legend("topright", legend = feelings, fill = custom_colors,
+       bty = "n", cex = 0.8)
 ```
 
 
@@ -278,11 +338,11 @@ data3 <- data[c('Q1.AI_knowledge', 'Q3.2.Job_replacement', 'Q3.3.Problem_solving
 
 data3 <- data3 %>%
   mutate(Q1.AI_knowledge = case_when(
-    Q1.AI_knowledge %in% c(1, 2) ~ "very poorly informed/uninformed",
-    Q1.AI_knowledge %in% c(3, 4) ~ "poorly informed",
-    Q1.AI_knowledge %in% c(5, 6) ~ "sufficiently informed",
+    Q1.AI_knowledge %in% c(9, 10) ~ "very well informed",
     Q1.AI_knowledge %in% c(7, 8) ~ "well informed",
-    Q1.AI_knowledge %in% c(9, 10) ~ "very well informed"
+    Q1.AI_knowledge %in% c(5, 6) ~ "sufficiently informed",
+    Q1.AI_knowledge %in% c(3, 4) ~ "poorly informed",
+    Q1.AI_knowledge %in% c(1, 2) ~ "very poorly informed/uninformed"
   ),
   Q12.Gender = case_when(
     Q12.Gender == 1 ~ 'F',
@@ -294,7 +354,7 @@ data3 <- data3 %>%
     Q3.2.Job_replacement %in% c(2) ~ "Partially Disagree",
     Q3.2.Job_replacement %in% c(3) ~ "Neutral",
     Q3.2.Job_replacement %in% c(4) ~ "Partially Agree",
-    Q3.2.Job_replacement %in% c(5) ~ "Fully Agree"
+    Q3.2.Job_replacement %in% c(4,5) ~ "Fully Agree"
   ),
   Q3.3.Problem_solving = case_when(
     Q3.3.Problem_solving %in% c(1) ~ "Strongly Disagree",
@@ -304,26 +364,27 @@ data3 <- data3 %>%
     Q3.3.Problem_solving %in% c(5) ~ "Fully Agree"
   ),
   Q3.4.AI_rulling_society = case_when(
-    Q3.4.AI_rulling_society %in% c(1) ~ "Strongly Disagree",
-    Q3.4.AI_rulling_society %in% c(2) ~ "Partially Disagree",
-    Q3.4.AI_rulling_society %in% c(3) ~ "Neutral",
-    Q3.4.AI_rulling_society %in% c(4) ~ "Partially Agree",
-    Q3.4.AI_rulling_society %in% c(5) ~ "Fully Agree"))
+    Q3.4.AI_rulling_society %in% c(1) ~ "Very low",
+    Q3.4.AI_rulling_society %in% c(2) ~ "Low",
+    Q3.4.AI_rulling_society %in% c(3) ~ "Neighter low or high",
+    Q3.4.AI_rulling_society %in% c(4) ~ "High",
+    Q3.4.AI_rulling_society %in% c(5) ~ "Very high"))
 
 ```
 
 ```{r}
 data3 <- data3 %>%
-  mutate(Q1.AI_knowledge = factor(Q1.AI_knowledge, levels = c("very poorly informed/uninformed", "poorly informed", "sufficiently informed", "well informed", "very well informed"), ordered = TRUE))
+  mutate(Q1.AI_knowledge = factor(Q1.AI_knowledge, levels = c("very poorly informed/uninformed", "poorly informed", "sufficiently informed", "well informed", "very well informed"), ordered = FALSE))
 
 ordered_levels <- c("Strongly Disagree", "Partially Disagree", "Neutral", "Partially Agree", "Fully Agree")
+ordered_levels2 <- c("Very low", "Low", "Neighter low or high", "High", "Very high")
 
 data3 <- data3 %>%
   mutate(Q3.2.Job_replacement = factor(Q3.2.Job_replacement, levels = ordered_levels, ordered = TRUE))
 data3 <- data3 %>%
   mutate(Q3.3.Problem_solving = factor(Q3.3.Problem_solving, levels = ordered_levels, ordered = TRUE))
 data3 <- data3 %>%
-  mutate(Q3.4.AI_rulling_society = factor(Q3.4.AI_rulling_society, levels = ordered_levels, ordered = TRUE))
+  mutate(Q3.4.AI_rulling_society = factor(Q3.4.AI_rulling_society, levels = ordered_levels2, ordered = TRUE))
 ```
 
 
@@ -347,21 +408,38 @@ ggplot(knowledge_summary, aes(x = "", y = Percentage, fill = Category)) +
   geom_text(aes(label = percent(Percentage)), position = position_stack(vjust = 0.5))
 ```
 ```{r, echo=TRUE,warning=FALSE,message=FALSE,error=FALSE}
+# Summarize the data
 table_data <- data3 %>%
   group_by(Q12.Gender, Q1.AI_knowledge) %>%
   summarise(Count = n()) %>%
   mutate(Percentage = Count / sum(Count) * 100) %>%
   arrange(Q12.Gender, Q1.AI_knowledge)
-
 pivot_table <- table_data %>%
   select(-Count) %>%
   pivot_wider(names_from = Q12.Gender, values_from = Percentage, values_fill = list(Percentage = 0))
 
-pivot_table <- pivot_table %>%
+
+# Add additional columns from the second photo
+additional_data <- data.frame(
+  Q1.AI_knowledge = c("very well informed", "well informed", "sufficiently informed", "poorly informed", "very poorly informed/uninformed"),
+  Male_Additional = c(4.3, 23.6, 41.3, 27.0, 3.8),
+  Female_Additional = c(0.8, 11.2, 31.9, 41.7, 14.4),
+  Total_Additional = c(2.4, 16.8, 36.1, 35.1, 9.6)
+)
+
+# Merge the tables
+final_table <- pivot_table %>%
+  left_join(additional_data, by = "Q1.AI_knowledge")
+
+
+final_table <- final_table %>%
   mutate(across(where(is.numeric), ~ paste0(round(.x, 1), "%")))
 
-pivot_table %>% 
-  kable( format = "markdown", col.names = c("AI Knowledge Level", "Female (%)", "Male (%)")) %>% 
+# Format the table for display
+final_table %>% 
+  select(Q1.AI_knowledge, F, M,, Male_Additional, Female_Additional, Total_Additional) %>%
+  rename("AI Knowledge Level" = Q1.AI_knowledge, "Female (%)" = F, "Male (%)" = M, "Male (Paper)" = Male_Additional, "Female (Paper)" = Female_Additional, "Total (Paper)" = Total_Additional) %>%
+  kable(format = "markdown", col.names = c("AI Knowledge Level", "Female (%)", "Male (%)", "Female (Paper)", "Male (Paper)", "Total (Paper)")) %>%
   kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
 ```
 ```{r, echo=TRUE,warning=FALSE,message=FALSE,error=FALSE}
