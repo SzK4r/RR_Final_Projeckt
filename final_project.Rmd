@@ -41,6 +41,7 @@ library(dplyr)
 library(tidyr)
 library(knitr)
 library(kableExtra)
+library(car)
 ```
 
 2. Data 
@@ -149,10 +150,13 @@ print(fig2)
 ########## correlations
 
 # Select the relevant columns from the data frame
+```{r}
+colnames(data)
+```
 
 ```{r}
 selected_columns <- c("Q2.1.Internet", "Q2.2.Books.Papers", "Q2.3.Social_media", "Q2.4.Discussions", "Q2.5.NotInformed")
-selected_data <- data$Q1.AI_knowledge[, selected_columns]
+selected_data <- data[,selected_columns ]
 
 ```
 
@@ -202,7 +206,7 @@ print(data2)
 
 ```{r}
 # Define the column names and labels
-colnames(data) <- c('Q3.1.AI_dehumanization', 'Q3.2.Job_replacement', 'Q3.3.Problem_solving', 'Q3.4.AI_rulling_society',
+columns2 <- c('Q3.1.AI_dehumanization', 'Q3.2.Job_replacement', 'Q3.3.Problem_solving', 'Q3.4.AI_rulling_society',
                     'Q4.1.AI_costly', 'Q4.2.Economic_crisis', 'Q4.3.Economic_growth', 'Q4.4.Job_loss')
 labels <- c('AI encourages dehumanization', 'Robots will replace people at work', 'AI helps to solve many problems in society',
             'AI will rule society', 'Machinery using AI is very expensive',
@@ -211,7 +215,7 @@ labels <- c('AI encourages dehumanization', 'Robots will replace people at work'
 # Reshape the data for plotting
 data_subset_long <- melt(data)
 names(data_subset_long) <- c("variable", "value")
-data_subset_long$variable <- factor(data_subset_long$variable, levels = colnames(data), labels = labels)
+data_subset_long$variable <- factor(data_subset_long$variable, levels = columns2, labels = labels)
 
 # Create a color palette
 my_palette <- brewer.pal(8, "Set2")
@@ -295,10 +299,10 @@ percentages <- c(26.6, 10.3, 28.2, 11.2, 23.7)
 values <- percentages / 100 * sum(percentages)  # Assuming total sum of percentages as a whole
 
 # Create a dataframe
-data <- data.frame(categories, values)
+data_plot <- data.frame(categories, values)
 
 # Create the pie chart
-fig <- plot_ly(data, labels = ~categories, values = ~values, type = 'pie',
+fig <- plot_ly(data_plot, labels = ~categories, values = ~values, type = 'pie',
                textinfo = 'label+percent',
                insidetextorientation = 'radial',
                marker = list(colors = c('#FF7F0E', '#1F77B4', '#FFBB78', '#AEC7E8', '#2CA02C')))
@@ -334,7 +338,10 @@ legend("topright", legend = feelings, fill = custom_colors,
 
 
 ```{r}
-data3 <- data[c('Q1.AI_knowledge', 'Q3.2.Job_replacement', 'Q3.3.Problem_solving', 'Q3.4.AI_rulling_society', 'Q12.Gender')]
+selected_columns2 <- c("Q1.AI_knowledge", "Q3.2.Job_replacement", "Q3.3.Problem_solving", "Q3.4.AI_rulling_society", "Q12.Gender")
+
+data3 <- data[,selected_columns2]
+
 
 data3 <- data3 %>%
   mutate(Q1.AI_knowledge = case_when(
@@ -496,5 +503,50 @@ pivot_table4 <- pivot_table4 %>%
 
 pivot_table3 %>% 
   kable( format = "markdown", col.names = c("AI helps to solve many problems in society", "Female (%)", "Male (%)")) %>% 
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
+```
+
+## Tests
+
+Hypothesis 2 (H2). Male students have a different level of information regarding AI use than female students.
+
+# Levene's test for Equality of variances
+```{r}
+data$Q12.Gender <- as.factor(data$Q12.Gender)
+levene <- leveneTest(Q1.AI_knowledge ~ Q12.Gender, data = data)
+levene_f <- levene$`F value`[1]
+levene_p <- levene$`Pr(>F)`[1]
+```
+
+# t-Test for equality of means
+```{r}
+t_test_equal_var <- t.test(Q1.AI_knowledge ~ Q12.Gender, data = data, var.equal = TRUE)
+t_equal <- t_test_equal_var$statistic
+df_equal <- t_test_equal_var$parameter
+p_equal <- t_test_equal_var$p.value
+mean_diff_equal <- t_test_equal_var$estimate[1] - t_test_equal_var$estimate[2]
+```
+
+```{r}
+t_test_unequal_var <- t.test(Q1.AI_knowledge ~ Q12.Gender, data = data)
+t_unequal <- t_test_unequal_var$statistic
+df_unequal <- t_test_unequal_var$parameter
+p_unequal <- t_test_unequal_var$p.value
+mean_diff_unequal <- t_test_unequal_var$estimate[1] - t_test_unequal_var$estimate[2]
+```
+
+```{r}
+summary_table <- data.frame(
+  " " = c("Equal variances assumed", "Equal variances not assumed"),
+  F = c(levene_f, NA),
+  Sig = c(levene_p, NA),
+  t = c(t_equal, t_unequal),
+  df = c(df_equal, df_unequal),
+  "Sig (2-Tailed)" = c(p_equal, p_unequal),
+  "Mean difference" = c(mean_diff_equal, mean_diff_unequal)
+)
+
+# Print summary table
+summary_table %>% kable( format = "markdown") %>% 
   kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
 ```
