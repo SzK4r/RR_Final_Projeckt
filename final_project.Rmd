@@ -536,10 +536,26 @@ mean_diff_unequal <- t_test_unequal_var$estimate[1] - t_test_unequal_var$estimat
 ```
 
 ```{r}
+original_table <- data.frame(
+  ` ` = c("Equal variances assumed", "Equal variances not assumed"),
+  F = c(5.7, ""),
+  Sig = c(0.017, ""),
+  t = c(9.269, 9.254),
+  df = c(925, 886.056),
+  `Sig (2-Tailed)` = c(0.000, 0.000),
+  `Mean Difference` = c(0.553, 0.553)
+)
+
+# Display the table using kable
+original_table %>% kable(col.names = c("", "F", "Sig", "t", "df", "Sig (2-Tailed)", "Mean Difference"), caption = "Independent samples test for H2.") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
+```
+
+```{r}
 summary_table <- data.frame(
-  " " = c("Equal variances assumed", "Equal variances not assumed"),
-  F = c(levene_f, NA),
-  Sig = c(levene_p, NA),
+  ` ` = c("Equal variances assumed", "Equal variances not assumed"),
+  F = c(levene_f,''),
+  Sig = c(levene_p,''),
   t = c(t_equal, t_unequal),
   df = c(df_equal, df_unequal),
   "Sig (2-Tailed)" = c(p_equal, p_unequal),
@@ -550,3 +566,8 @@ summary_table <- data.frame(
 summary_table %>% kable( format = "markdown") %>% 
   kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
 ```
+
+
+Tests indicate that:
+- In both cases difference in variance is significant
+- In original data difference in AI knowledge between male and male students is significant with difference of .553 while in our data difference is equal only to -.0874
