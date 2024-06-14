@@ -20,38 +20,52 @@ output:
 ---
 
 
-1. Why it is important to reproduce the paper — problem description and topic importance
+# 1. Why it is important to reproduce the paper — Problem Description and Topic Importance
 
 The perception of students on AI in education is a crucial topic to analyze from an economic standpoint. The incorporation of AI in the education sector has been increasing in recent years, with the emergence of smart classrooms and personalized learning platforms. The potential benefits of AI in education include improved learning outcomes, increased accessibility, and efficiency gains in educational delivery.
+
 Understanding the perceptions of students towards AI in education is vital to inform policies and investment decisions in the education sector. The analysis of student perceptions can provide insights into the potential barriers and facilitators to AI adoption in education, as well as inform strategies for the development of AI technologies that are sensitive to student needs and concerns.
 
-This paper aims to analyze students’ perception on the AI in Education. Therfore we decide to examine the differences between the studies. 
+This paper aims to analyze students’ perception on the AI in Education. Therefore, we decide to examine the differences between the studies.
 
+## Required Packages
 
-Loading required packages
+Click on the arrow to the right to see the required R packages used in this analysis.
+
+<details>
+<summary>Load Required Libraries</summary>
+
 ```{r}
+# Loading necessary libraries for analysis
 library(rstudioapi)
-library(tidyverse)
-library(RColorBrewer)
-library(reshape2)
-library(ggplot2)
-library(kableExtra)
-library(scales)
-library(dplyr)
-library(tidyr)
-library(knitr)
-library(kableExtra)
-library(car)
-```
+library(tidyverse)        # Data manipulation and visualization
+library(RColorBrewer)     # Color palettes
+library(reshape2)         # Data reshaping
+library(ggplot2)          # Creating graphics
+library(kableExtra)       # Enhancing tables
+library(scales)           # Scale functions for visualization
+library(dplyr)            # Data manipulation
+library(tidyr)            # Data tidying
+library(knitr)            # Automatic reporting
+library(kableExtra)       # Enhancing tables
+library(car)              # Advanced regression models
+``` 
 
-2. Data 
-In terms of the comparison, the data we found are excellent as they both compare student and both from Romania. Unfortunately, our data set is *10 times smaller* but much more informative. Our data are also much more up to date and we can say that we compare data between two "AI Waves" — one from 2017 and another from 2022. 
+
+# 2. Data
+
+In terms of the comparison, the data we found are excellent as they both compare students and are both from Romania. Unfortunately, our dataset is *10 times smaller* but much more informative. Our data are also much more up to date, and we can say that we compare data between two "AI Waves" — one from 2017 and another from 2022.
 
 The dataset utilized in this study encompasses the responses obtained from a survey administered to undergraduate students in their 2nd and 3rd years of study at the Faculty of Cybernetics, Statistics, and Economic Informatics. The survey was conducted online and disseminated through social media groups. Its objective was to acquire insights into students' perceptions regarding the role of artificial intelligence (AI) in the domain of education.
 
 This dataset comprises a total of 96 observations, each representing a unique case or participant. Additionally, the dataset contains 36 variables, which encompass the different characteristics or attributes under investigation.
 
-Loading the data
+## 2.1 Loading the Data
+
+Click on the arrow to the right to view the code used for loading the data.
+
+<details>
+<summary>Load Dataset from Local Storage</summary>
 ```{r}
 current_path <- rstudioapi::getActiveDocumentContext()$path
 current_path <- path.expand(current_path)
@@ -63,40 +77,152 @@ to_csv
 ```{r}
 data <- read.csv(to_csv)
 ```
+</details>
 
-Checking the structure of the data
+
+
+## 2.2 List of Variables
+
+This section provides a description of the variables used in the study. The main dependent variable is concerned with the perceived utility of AI in the educational process.
+
+### Dependent Variable
+
+- **Q7.Utility_grade**: On a scale of 1 to 10, how useful do you think AI would be in the educational process? 
+  - 1: Not useful at all
+  - 10: Extremely useful
+
+### Independent Variables
+
+#### Identification
+- **ID**: Student ID
+
+#### Knowledge and Sources about AI
+- **Q1.AI_knowledge**: Level of knowledge about artificial intelligence on a scale of 1 to 10
+  - 1: Not informed at all
+  - 10: Extremely informed
+- **Q2.AI_sources**: Sources used to learn about artificial intelligence:
+  - **Q2.1.Internet**: Whether Internet was used as a source (1 = Yes, 0 = No)
+  - **Q2.2.Books.Papers**: Whether Books/Scientific papers were used (1 = Yes, 0 = No)
+  - **Q2.3.Social_media**: Whether social media was used (1 = Yes, 0 = No)
+  - **Q2.4.Discussions**: Whether discussions with family/friends were used (1 = Yes, 0 = No)
+  - **Q2.5.NotInformed**: Indicator if "I don't inform myself about AI" was chosen (1 = Yes, 0 = No)
+
+#### Opinions on AI
+- **Q3.1.AI_dehumanization**: AI encourages dehumanization (1-5 scale)
+- **Q3.2.Job_replacement**: Robots will replace people at work (1-5 scale)
+- **Q3.3.Problem_solving**: AI helps to solve many problems in society (1-5 scale)
+- **Q3.4.AI_rulling_society**: AI will rule society (1-5 scale)
+- **Q4.1.AI_costly**: Machinery using AI is very expensive to build and maintain (1-5 scale)
+- **Q4.2.Economic_crisis**: AI will lead to a global economic crisis (1-5 scale)
+- **Q4.3.Economic_growth**: AI will help global economic growth (1-5 scale)
+- **Q4.4.Job_loss**: AI leads to job losses (1-5 scale)
+
+#### Personal Feelings and Impact Domains
+- **Q5.Feelings**: Feelings associated with AI
+  - 1: Curiosity
+  - 2: Fear
+  - 3: Indifference
+  - 4: Trust
+- **Q6.Domains**: Areas where AI would have a big impact
+  - **Q6.1.Education**: (1 = Yes, 0 = No)
+  - **Q6.2.Medicine**: (1 = Yes, 0 = No)
+  - **Q6.3.Agriculture**: (1 = Yes, 0 = No)
+  - **Q6.4.Constructions**: (1 = Yes, 0 = No)
+  - **Q6.5.Marketing**: (1 = Yes, 0 = No)
+  - **Q6.6.Administration**: (1 = Yes, 0 = No)
+  - **Q6.7.Art**: (1 = Yes, 0 = No)
+
+#### Educational Process
+- **Q8.Advantage_teaching**: Main advantage of AI in the teaching process (1-4 scale)
+- **Q9.Advantage_learning**: Level of advantage of AI in the learning process (1-4 scale)
+- **Q10.Advantage_evaluation**: Level of advantage of AI in the evaluation process (1-4 scale)
+- **Q11.Disadvantage_educational_process**: Level of disadvantage of AI in the educational process (1-4 scale)
+
+#### Demographics and Academic Performance
+- **Q12.Gender**: Gender of the student (1 = Male, 2 = Female)
+- **Q13.Year_of_study**: Year of study of the student (1-Year 2, 2-Year 3)
+- **Q14.Major**: Major or field of study of the student
+  - 1: Economic Cybernetics
+  - 2: Statistics and Economic Forecasting
+  - 3: Economic Informatics
+- **Q15.Passed_exams**: Indicator if the student passed the exams (1 = Yes, 0 = No)
+- **Q16.GPA**: Student's GPA for the last year of study on a scale from 1 to 10
+
+# 4. Further Data Analysis and Visualization
+
+Continuing with our analysis, we now focus on transforming the data and examining it for completeness, followed by a comparative study with previous findings.
+
+## Examining Data Structure
+
+To understand the variables and their types better, check the data structure by expanding the section below.
+
+<details>
+<summary>View Data Structure</summary>
 
 ```{r}
+# Show the structure of the data to verify variable types and completeness
 str(data)
 ```
+</details>
+### Cleaning Data
+Removing Unnecessary Variables
+Since some character variables are only annotations, they will be removed. See the details of this process below.
 
-Deleting character variables (they're only as comments for the variables for Q2.1-Q2.5 and Q6.1-Q6.7)
-
+<details>
+<summary>Remove Character Variables</summary>
 ```{r}
+# Removing character variables that serve as comments for certain responses
 data <- subset(data, select = -c(Q2.AI_sources, Q6.Domains, ID))
 ```
+</details>
+### Converting Variables to Numeric
+To facilitate our analysis, all variables need to be numeric. This conversion can be reviewed below.
 
-Changing all variables to numeric
-
+<details>
+<summary>Convert All Variables to Numeric</summary>
 ```{r}
+# Converting all variables in the dataset to numeric for consistent analysis
 data <- mutate_all(data, as.numeric)
 ```
+</details>
+### Checking for Missing Values
+Before proceeding further, it's essential to ensure there are no missing values in the dataset.
 
-Checking for missing values
-
+<details>
+<summary>Check for Missing Values</summary>
 ```{r}
+# Check and print the sum of missing values across all columns
 print(missing_values <- colSums(is.na(data)))
 ```
-Creating data frame with sources of students' knowledge with their counts and producing an appropriate plot
+</details>
+### Comparative Analysis with Earlier Studies
 
-Comparison with the paper:
-A first perspective they identify how well the respondents understood the concept of artificial intelligence. Their results show that 84.6% consider that they know what artificial intelligence means, whereas 12% claim that they do not know what the concept means. At the same time, 3.4% answered “I don’t know/I won’t answer”
+In the referenced study, different levels of AI awareness among students were reported:
 
-The highest percentage belongs to the category of those who believe that they have an average awareness of artificial intelligence (36.1%). By referring to this average category, while cumulating two other answers (very well informed, 2.4%, and well informed, 16.8%), which represent the number of those with an above-average level of awareness, as well as cumulating the remaining two answers (poorly informed, 35%, and very poorly informed, 9.7%) which represent the category of those with a below-average level of awareness, showing that the number of those who consider themselves less informed is greater than the category of those who believe that they are well informed on the subject (44.7% as opposed to 19.2%).
+84.6% reported understanding what artificial intelligence means.
+12% claimed they do not know what AI is.
+3.4% chose not to answer or expressed uncertainty.
+Further breakdown showed:
 
-// weź wrzuć tutaj jakiś plot w porównaniu z naszymi danymi. 
+36.1% have an average awareness of AI.
+19.2% combined are very well informed (2.4%) and well informed (16.8%).
+44.7% combined are less informed, including poorly informed (35%) and very poorly informed (9.7%).
 
-No missing values found, so we can proceed with the barplot of students' knowledge
+
+# 5. Visual Analysis of Student Knowledge
+
+With no missing values confirmed, we proceed to a visual representation of student knowledge on AI.
+
+The provided plot shows the distribution of AI knowledge ratings among students. It is observed that:
+
+- The ratings of 7.5 and 5.0 are most frequent, indicating a moderate to good understanding of AI by the majority.
+- Extremely low (2.5) and high (10.0) ratings are less frequent, reflecting that fewer students consider their understanding of AI to be very poor or excellent.
+- The distribution centers around mid to slightly higher knowledge ratings, with fewer students at the extremes.
+
+This visualization is crucial for understanding the spread of AI knowledge levels across the surveyed student population and helps in identifying areas where additional education or clarification might be needed.
+
+<details>
+<summary>Click here to view the code used for generating the plot</summary>
 
 ```{r}
 custom_colors <- brewer.pal(10, "Spectral")
@@ -114,23 +240,36 @@ fig1 <- ggplot(data, aes(x = Q1.AI_knowledge)) +
         legend.title = element_blank(),
         legend.position = "none")
 
+
+```
+</details>
+```{r}
 print(fig1)
 ```
 
 
+# 6. Analysis of Information Sources
 
+We analyzed the sources students use to inform themselves about artificial intelligence, which is crucial for understanding their exposure and potentially the depth of their knowledge.
 
+The bar plot below illustrates the proportion of students using each source:
+
+- **Internet**: The most utilized source, used by nearly 40% of the students.
+- **Social Media**: The second most popular source, with about 25% usage.
+- **Books/Papers**: Follows closely behind social media, used by roughly 20% of the students.
+- **Discussions**: Less common, with around 15% of students engaging in discussions about AI.
+- **Not Informed**: A small proportion, approximately 5%, do not seek information about AI.
+
+This distribution suggests a heavy reliance on digital sources, with traditional sources like books and papers still playing a significant role.
+<details>
+<summary>Click here to view the code used for generating the plot</summary>
 ```{r}
 source_names <- c("Internet", "Books/Papers", "Social Media", "Discussions", "Not Informed")
 source_counts <- sapply(data[, c("Q2.1.Internet", "Q2.2.Books.Papers", "Q2.3.Social_media", "Q2.4.Discussions", "Q2.5.NotInformed")], function(col) sum(col == 1))
 
 source_data <- data.frame(Source = source_names, Count = source_counts)
-
 source_data$Proportion <- source_data$Count / sum(source_data$Count)
 
-```
-
-```{r}
 custom_colors <- brewer.pal(5, "Spectral")
 fig2 <- ggplot(source_data, aes(x = reorder(Source, -Proportion), y = Proportion, fill = Source)) +
   geom_bar(stat = "identity", color = "black") +
@@ -145,39 +284,56 @@ fig2 <- ggplot(source_data, aes(x = reorder(Source, -Proportion), y = Proportion
         legend.position = "right") +
   scale_fill_manual(values = custom_colors)
 
+```
+</details>
+```{r}
 print(fig2)
 ```
-########## correlations
 
-# Select the relevant columns from the data frame
-```{r}
-colnames(data)
-```
+# 7. Correlation Analysis Among Information Sources
+
+This section explores the relationships between different sources students use to inform themselves about artificial intelligence. A correlation heatmap provides a visual representation of these relationships.
+
+The heatmap below shows how each source of information correlates with others. Positive correlations (shown in blue) suggest that students who use one source are likely to use another, whereas negative correlations (shown in red) suggest that students who use one source are less likely to use another.
+
+
+
+<details>
+<summary>Click here to view the code used for generating the correlation heatmap</summary>
 
 ```{r}
 selected_columns <- c("Q2.1.Internet", "Q2.2.Books.Papers", "Q2.3.Social_media", "Q2.4.Discussions", "Q2.5.NotInformed")
-selected_data <- data[,selected_columns ]
-
-```
+selected_data <- data[,selected_columns]
 
 # Calculate the correlation matrix and round the values
-
-```{r}
 correlation_matrix <- round(cor(selected_data), 2)
 correlation_data <- melt(correlation_matrix)
 
-print(correlation_data)
-
-ggplot(data = correlation_data, aes(x = Var1, y = Var2, fill = value)) +
+# Genrate heatMap
+corelationHeatMap <- ggplot(data = correlation_data, aes(x = Var1, y = Var2, fill = value)) +
   geom_tile(color = "white") +
   scale_fill_gradient2(low = "red", mid = "white", high = "blue", midpoint = 0) +
   theme_minimal() +
   labs(title = "Correlation Heatmap", x = "", y = "") +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+```
+</details>
 
+```{r}
+print(corelationHeatMap)
 ```
 
-Relation with student's knowledge about AI
+
+# 9. Relation of Student Knowledge about AI to Their Views on Various AI-related Statements
+
+This section explores how students' knowledge about AI correlates with their opinions on various AI-related statements. The analysis aims to discern patterns or trends in agreement levels across different knowledge segments.
+
+## 9.1 Analysis of Mean Knowledge Scores by Information Source Usage
+
+We first analyze the mean AI knowledge scores for students based on whether they use specific information sources. This provides insights into whether accessing particular types of information correlates with higher AI knowledge.
+
+<details>
+<summary>Click here to view the code used for this analysis</summary>
 
 ```{r}
 # Define the columns vector
@@ -198,11 +354,15 @@ for (i in columns) {
 data2 <- data.frame(t(as.data.frame(results)))
 colnames(data2) <- c("No - MeanQ1", "Yes - MeanQ1", "Absolute Change")
 row.names(data2) <- columns
-
-# Print the resulting data frame
-print(data2)
-
 ```
+
+## 9.3 Visualization of Agreement Levels on AI Statements
+
+The violin plot below visualizes students' levels of agreement with various statements about AI, ranging from its impact on society and work to its economic implications.
+
+
+<details>
+<summary>Click here to view the code used for generating the violin plot</summary>
 
 ```{r}
 # Define the column names and labels
@@ -233,36 +393,31 @@ p <- ggplot(data_subset_long, aes(x = variable, y = value, fill = variable)) +
         panel.grid.major.y = element_blank(),
         panel.grid.minor = element_blank(),
         panel.border = element_blank())
-
+```
+</details>
+```{r}
 # Print the plot
 print(p)
 ```
 
+
+
+# 10. Analysis of Students' Feelings About the Development of AI
+
+In this section, we explore how students feel about the development of AI, a key factor in understanding their emotional and psychological engagement with this technology.
+
+The pie chart below illustrates the distribution of feelings among students:
+
+- **Curiosity** is the most dominant feeling, representing 68.1% of the responses, indicating a high level of interest and positive engagement with AI.
+- **Fear** comes next at 13.2%, suggesting a significant minority of students harbor concerns about AI's implications.
+- **Indifference** and **Trust** represent smaller proportions at 11% and 7.7% respectively, showing that fewer students feel neutral towards AI or trust it implicitly.
+
+![Students' Feelings about the Development of AI](path/to/your/pie_chart.png)
+
+<details>
+<summary>Click here to view the code used for generating the pie chart</summary>
+
 ```{r}
-######### standard deviations in answers
-
-# Calculate standard deviations
-standard_deviations <- sapply(columns, function(column) {
-  sd(data[[column]])
-})
-
-# Convert standard deviations to a data frame
-sd_data <- data.frame(variable = names(standard_deviations),
-                      sd = standard_deviations)
-
-# Sort the data frame by standard deviation values
-sd_data <- sd_data[order(sd_data$sd), ]
-
-# Create a styled table
-styled_table <- sd_data %>%
-  kable(col.names = c("Variable", "Standard Deviation")) %>%
-  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
-
-styled_table
-
-```
-```{r}
-
 # Extract the desired values and labels from the dataframe
 feelings <- c('Curiosity', 'Fear', 'Indifference', 'Trust')
 # Assuming that data$Q5.Feelings is your vector of feelings
@@ -279,7 +434,10 @@ percentages <- round(counts / sum(counts) * 100, 1)
 
 # Labels with percentages
 labels <- paste(percentages, "%\n", feelings, sep="")
+```
+</details>
 
+```{r}
 # Create the pie chart with enhanced appearance
 pie(counts, labels = labels, col = custom_colors, border = 'white', 
     init.angle = 90, clockwise = TRUE, main = "Students' Feelings about the Development of AI")
@@ -287,8 +445,9 @@ pie(counts, labels = labels, col = custom_colors, border = 'white',
 # Add a legend
 legend("right", legend = feelings, fill = custom_colors,
        bty = "n", cex = 0.8)
-
 ```
+
+
 ```{r}
 # Load necessary libraries
 library(plotly)
@@ -316,27 +475,86 @@ fig <- fig %>% layout(title = 'Students perception of AI',
 # Render the plot
 fig
 ```
+
+# 11. Comparison of Students' Perception of AI
+
+In this section, we compare our dataset's results concerning students' perceptions of AI with another study visualized in the pie chart above. This comparison will help identify any shifts in sentiment or notable differences in how students perceive AI.
+
+## Compared Paper Study Results
+
+Below is a summary of our study results for comparison:
+
+- **Confused**: 26.6%
+- **Indifferent**: 10.3%
+- **Optimistic**: 28.2%
+- **Enthusiastic**: 11.2%
+- **Concerned**: 23.7%
+
+The comparison highlights a higher optimism and enthusiasm among our study participants, with lower levels of confusion and concern compared to the mentioned study.
+
 ```{r}
-feelings <- c("Curiosity", "Fear", "Indifference", "Trust")
-percentages <- c(68.1, 13.2, 11, 7.7)
+# Load necessary libraries
+library(plotly)
+
+# Data from our study
+categories <- c("confused", "indifferent", "optimistic", "enthusiastic", "concerned")
+percentages <- c(26.6, 10.3, 28.2, 11.2, 23.7)
 values <- percentages / 100 * sum(percentages)  # Assuming total sum of percentages as a whole
 
-# Define custom colors for the pie slices
-custom_colors <- c('#F8766D', '#00BA38', '#619CFF', '#FFB028')
+# Create a dataframe
+data_plot <- data.frame(categories, values)
 
-# Labels with percentages
-labels <- paste(percentages, "% ", feelings, sep="")
+# Create the pie chart for our study
+fig <- plot_ly(data_plot, labels = ~categories, values = ~values, type = 'pie',
+               textinfo = 'label+percent',
+               insidetextorientation = 'radial',
+               marker = list(colors = c('#FF7F0E', '#1F77B4', '#FFBB78', '#AEC7E8', '#2CA02C')))
 
-# Create the pie chart with enhanced appearance
-pie(values, labels = labels, col = custom_colors, border = 'white', 
-    init.angle = 90, clockwise = TRUE, main = "Students' Feelings about the Development of AI")
+# Enhance the layout
+fig_from_paper <- fig %>% layout(title = 'Our Study: Students Perception of AI',
+                      showlegend = TRUE,
+                      xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                      yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+```
 
-# Optionally, add a legend if required
-legend("topright", legend = feelings, fill = custom_colors,
-       bty = "n", cex = 0.8)
+```{r}
+# Render the plot
+fig_from_paper
 ```
 
 
+
+# 12. Comparison of AI Knowledge Levels Over Time
+
+This analysis compares the distribution of AI knowledge levels between our current data and previous findings, providing insights into how perceptions have evolved over time.
+
+## Overview of Previous Findings
+
+The previous study presented AI knowledge levels as follows:
+- **Very Poorly Informed/Uninformed**: 10%
+- **Poorly Informed**: 35%
+- **Sufficiently Informed**: 36%
+- **Well Informed**: 17%
+- **Very Well Informed**: 2%
+
+These results indicate a larger proportion of students either poorly informed or only sufficiently informed about AI.
+
+## Current Study Results
+
+Our study shows a different distribution:
+- **Very Poorly Informed/Uninformed**: 7.7%
+- **Poorly Informed**: 5.5%
+- **Sufficiently Informed**: 37.4%
+- **Well Informed**: 16.5%
+- **Very Well Informed**: 33.0%
+
+These results suggest a significant increase in the proportion of students who are very well informed about AI, coupled with a decrease in those who are very poorly informed or uninformed.
+
+## Visual Comparison
+
+The following visual comparison illustrates these changes:
+<details>
+<summary>Click here to view the code used for generating the comparison plot</summary>
 ```{r}
 selected_columns2 <- c("Q1.AI_knowledge", "Q3.2.Job_replacement", "Q3.3.Problem_solving", "Q3.4.AI_rulling_society", "Q12.Gender")
 
@@ -377,9 +595,6 @@ data3 <- data3 %>%
     Q3.4.AI_rulling_society %in% c(4) ~ "High",
     Q3.4.AI_rulling_society %in% c(5) ~ "Very high"))
 
-```
-
-```{r}
 data3 <- data3 %>%
   mutate(Q1.AI_knowledge = factor(Q1.AI_knowledge, levels = c("very poorly informed/uninformed", "poorly informed", "sufficiently informed", "well informed", "very well informed"), ordered = FALSE))
 
@@ -392,16 +607,14 @@ data3 <- data3 %>%
   mutate(Q3.3.Problem_solving = factor(Q3.3.Problem_solving, levels = ordered_levels, ordered = TRUE))
 data3 <- data3 %>%
   mutate(Q3.4.AI_rulling_society = factor(Q3.4.AI_rulling_society, levels = ordered_levels2, ordered = TRUE))
-```
 
 
-```{r}
 knowledge_summary <- data3 %>%
   count(Q1.AI_knowledge) %>%
   rename(Category = Q1.AI_knowledge, Count = n) %>%
   mutate(Percentage = Count / sum(Count))
 
-ggplot(knowledge_summary, aes(x = "", y = Percentage, fill = Category)) +
+Distribution_plot <- ggplot(knowledge_summary, aes(x = "", y = Percentage, fill = Category)) +
   geom_bar(stat = "identity", width = 1) +
   coord_polar(theta = "y") +
   labs(title = "Distribution of AI Knowledge Levels",
@@ -414,6 +627,21 @@ ggplot(knowledge_summary, aes(x = "", y = Percentage, fill = Category)) +
   scale_fill_brewer(palette = "RdYlGn") + 
   geom_text(aes(label = percent(Percentage)), position = position_stack(vjust = 0.5))
 ```
+</details>
+```{r}
+print(Distribution_plot)
+```
+# 10. Insights and Discussion
+This comparative analysis reveals several key insights:
+
+- There has been a notable increase in the percentage of "very well informed" individuals across both genders in recent years.
+- The percentage of individuals who are "very poorly informed" has decreased, indicating improved awareness and understanding of AI.
+- Gender disparities in AI knowledge that were evident in earlier data appear to be narrowing, with more equitable knowledge distribution in the latest data.
+
+This structured approach allows readers to delve into the details of the analysis and easily understand the comparative results, maintaining a clear narrative while providing access to the underlying data and methodologies.
+
+<details>
+<summary>Click here to view the generated table</summary>
 ```{r, echo=TRUE,warning=FALSE,message=FALSE,error=FALSE}
 # Summarize the data
 table_data <- data3 %>%
@@ -449,6 +677,9 @@ final_table %>%
   kable(format = "markdown", col.names = c("AI Knowledge Level", "Female (%)", "Male (%)", "Female (Paper)", "Male (Paper)", "Total (Paper)")) %>%
   kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
 ```
+</details>
+
+
 ```{r, echo=TRUE,warning=FALSE,message=FALSE,error=FALSE}
 table_data2 <- data3 %>%
   group_by(Q12.Gender, Q3.2.Job_replacement) %>%
