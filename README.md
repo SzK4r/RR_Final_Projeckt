@@ -42,12 +42,12 @@ The main list of tasks that we wanted to accomplish is outlined below.
 - [x] Finding research paper
 - [x] Loading the data
 - [x] Importing R packages relevant for data analysis
-- [ ] Forecasting
-- [ ] Plotting forecast results
-- [ ] Documenting code
-- [ ] Were the results replicated?
-- [ ] Peper Presentation  
-- [ ] Exporting results to a Quarto html report
+- [x] Forecasting
+- [x] Plotting forecast results
+- [x] Documenting code
+- [x] Were the results replicated?
+- [x] Peper Presentation  
+- [x] Exporting results to a Quarto html report
 
 
 ## Team members

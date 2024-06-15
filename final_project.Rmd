@@ -37,7 +37,7 @@ Click on the arrow to the right to see the required R packages used in this anal
 
 ```{r}
 # Loading necessary libraries for analysis
-library(rstudioapi)
+
 library(tidyverse)        # Data manipulation and visualization
 library(RColorBrewer)     # Color palettes
 library(reshape2)         # Data reshaping
@@ -49,7 +49,9 @@ library(tidyr)            # Data tidying
 library(knitr)            # Automatic reporting
 library(kableExtra)       # Enhancing tables
 library(car)              # Advanced regression models
-``` 
+library(rstudioapi)       # Data manipulation and visualization
+library(plotly)           # Data manipulation and visualization
+```     
 
 
 # 2. Data
@@ -64,7 +66,7 @@ This dataset comprises a total of 96 observations, each representing a unique ca
 
 Click on the arrow to the right to view the code used for loading the data.
 
-<details>
+<details>   
 <summary>Load Dataset from Local Storage</summary>
 ```{r}
 current_path <- rstudioapi::getActiveDocumentContext()$path
@@ -195,18 +197,6 @@ Before proceeding further, it's essential to ensure there are no missing values 
 print(missing_values <- colSums(is.na(data)))
 ```
 </details>
-### Comparative Analysis with Earlier Studies
-
-In the referenced study, different levels of AI awareness among students were reported:
-
-84.6% reported understanding what artificial intelligence means.
-12% claimed they do not know what AI is.
-3.4% chose not to answer or expressed uncertainty.
-Further breakdown showed:
-
-36.1% have an average awareness of AI.
-19.2% combined are very well informed (2.4%) and well informed (16.8%).
-44.7% combined are less informed, including poorly informed (35%) and very poorly informed (9.7%).
 
 
 # 5. Visual Analysis of Student Knowledge
@@ -324,11 +314,11 @@ print(corelationHeatMap)
 ```
 
 
-# 9. Relation of Student Knowledge about AI to Their Views on Various AI-related Statements
+# 8. Relation of Student Knowledge about AI to Their Views on Various AI-related Statements
 
 This section explores how students' knowledge about AI correlates with their opinions on various AI-related statements. The analysis aims to discern patterns or trends in agreement levels across different knowledge segments.
 
-## 9.1 Analysis of Mean Knowledge Scores by Information Source Usage
+## 8.1 Analysis of Mean Knowledge Scores by Information Source Usage
 
 We first analyze the mean AI knowledge scores for students based on whether they use specific information sources. This provides insights into whether accessing particular types of information correlates with higher AI knowledge.
 
@@ -356,7 +346,7 @@ colnames(data2) <- c("No - MeanQ1", "Yes - MeanQ1", "Absolute Change")
 row.names(data2) <- columns
 ```
 
-## 9.3 Visualization of Agreement Levels on AI Statements
+## 8.2 Visualization of Agreement Levels on AI Statements
 
 The violin plot below visualizes students' levels of agreement with various statements about AI, ranging from its impact on society and work to its economic implications.
 
@@ -364,7 +354,7 @@ The violin plot below visualizes students' levels of agreement with various stat
 <details>
 <summary>Click here to view the code used for generating the violin plot</summary>
 
-```{r}
+```{r, echo=TRUE,warning=FALSE,message=FALSE,error=FALSE}
 # Define the column names and labels
 columns2 <- c('Q3.1.AI_dehumanization', 'Q3.2.Job_replacement', 'Q3.3.Problem_solving', 'Q3.4.AI_rulling_society',
                     'Q4.1.AI_costly', 'Q4.2.Economic_crisis', 'Q4.3.Economic_growth', 'Q4.4.Job_loss')
@@ -402,7 +392,7 @@ print(p)
 
 
 
-# 10. Analysis of Students' Feelings About the Development of AI
+# 9. Analysis of Students' Feelings About the Development of AI
 
 In this section, we explore how students feel about the development of AI, a key factor in understanding their emotional and psychological engagement with this technology.
 
@@ -411,8 +401,6 @@ The pie chart below illustrates the distribution of feelings among students:
 - **Curiosity** is the most dominant feeling, representing 68.1% of the responses, indicating a high level of interest and positive engagement with AI.
 - **Fear** comes next at 13.2%, suggesting a significant minority of students harbor concerns about AI's implications.
 - **Indifference** and **Trust** represent smaller proportions at 11% and 7.7% respectively, showing that fewer students feel neutral towards AI or trust it implicitly.
-
-![Students' Feelings about the Development of AI](path/to/your/pie_chart.png)
 
 <details>
 <summary>Click here to view the code used for generating the pie chart</summary>
@@ -448,35 +436,7 @@ legend("right", legend = feelings, fill = custom_colors,
 ```
 
 
-```{r}
-# Load necessary libraries
-library(plotly)
-
-# Data from the image
-categories <- c("confused", "indifferent", "optimistic", "enthusiastic", "concerned")
-percentages <- c(26.6, 10.3, 28.2, 11.2, 23.7)
-values <- percentages / 100 * sum(percentages)  # Assuming total sum of percentages as a whole
-
-# Create a dataframe
-data_plot <- data.frame(categories, values)
-
-# Create the pie chart
-fig <- plot_ly(data_plot, labels = ~categories, values = ~values, type = 'pie',
-               textinfo = 'label+percent',
-               insidetextorientation = 'radial',
-               marker = list(colors = c('#FF7F0E', '#1F77B4', '#FFBB78', '#AEC7E8', '#2CA02C')))
-
-# Enhance the layout
-fig <- fig %>% layout(title = 'Students perception of AI',
-                      showlegend = TRUE,
-                      xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-                      yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
-
-# Render the plot
-fig
-```
-
-# 11. Comparison of Students' Perception of AI
+# 10. Comparison of Students' Perception of AI
 
 In this section, we compare our dataset's results concerning students' perceptions of AI with another study visualized in the pie chart above. This comparison will help identify any shifts in sentiment or notable differences in how students perceive AI.
 
@@ -491,6 +451,8 @@ Below is a summary of our study results for comparison:
 - **Concerned**: 23.7%
 
 The comparison highlights a higher optimism and enthusiasm among our study participants, with lower levels of confusion and concern compared to the mentioned study.
+<details>
+<summary>Click here to view the code used for generating the pie chart</summary>
 
 ```{r}
 # Load necessary libraries
@@ -516,6 +478,7 @@ fig_from_paper <- fig %>% layout(title = 'Our Study: Students Perception of AI',
                       xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
                       yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 ```
+</details>
 
 ```{r}
 # Render the plot
@@ -524,7 +487,7 @@ fig_from_paper
 
 
 
-# 12. Comparison of AI Knowledge Levels Over Time
+# 11. Comparison of AI Knowledge Levels Over Time
 
 This analysis compares the distribution of AI knowledge levels between our current data and previous findings, providing insights into how perceptions have evolved over time.
 
@@ -553,6 +516,7 @@ These results suggest a significant increase in the proportion of students who a
 ## Visual Comparison
 
 The following visual comparison illustrates these changes:
+
 <details>
 <summary>Click here to view the code used for generating the comparison plot</summary>
 ```{r}
@@ -628,84 +592,107 @@ Distribution_plot <- ggplot(knowledge_summary, aes(x = "", y = Percentage, fill 
   geom_text(aes(label = percent(Percentage)), position = position_stack(vjust = 0.5))
 ```
 </details>
+
 ```{r}
 print(Distribution_plot)
 ```
-# 10. Insights and Discussion
-This comparative analysis reveals several key insights:
 
-- There has been a notable increase in the percentage of "very well informed" individuals across both genders in recent years.
-- The percentage of individuals who are "very poorly informed" has decreased, indicating improved awareness and understanding of AI.
-- Gender disparities in AI knowledge that were evident in earlier data appear to be narrowing, with more equitable knowledge distribution in the latest data.
+# 12. Job replecemnt by AI
 
-This structured approach allows readers to delve into the details of the analysis and easily understand the comparative results, maintaining a clear narrative while providing access to the underlying data and methodologies.
+This analysis explores how attitudes towards AI replacing jobs vary by gender, comparing current study results with historical data. This helps us understand trends in perceptions about AI's impact on employment and how these perceptions may differ between males and females.
 
+## Overview of Previous Study Findings
+
+In the previous study, the distribution of attitudes towards AI replacing jobs by gender was as follows:
+
+- **Males** were more likely to fully agree (28.1%) that AI should replace jobs.
+- **Females** showed more caution with a lower percentage (5.1%) fully agreeing to the idea.
+- **Neutral** positions were significantly less common among males (6.2%) compared to females (22%).
+
+These figures indicate a gender disparity in how the implications of AI on jobs are perceived, with males generally showing more acceptance of AI job replacement.
+
+## Current Study Results
+
+Our study shows a different pattern:
+
+- **Fully Agree**: Males (28.1%) continue to be more accepting than females (5.1%).
+- **Partially Agree**: More females (39%) agree to some extent compared to males (31.2%).
+- **Neutral**: A significant proportion of females (22%) remain neutral, much higher than males (6.2%).
+
+The table below details these distributions:
 <details>
-<summary>Click here to view the generated table</summary>
+<summary>Click here to view the code and generated table</summary>
 ```{r, echo=TRUE,warning=FALSE,message=FALSE,error=FALSE}
-# Summarize the data
-table_data <- data3 %>%
-  group_by(Q12.Gender, Q1.AI_knowledge) %>%
-  summarise(Count = n()) %>%
-  mutate(Percentage = Count / sum(Count) * 100) %>%
-  arrange(Q12.Gender, Q1.AI_knowledge)
-pivot_table <- table_data %>%
-  select(-Count) %>%
-  pivot_wider(names_from = Q12.Gender, values_from = Percentage, values_fill = list(Percentage = 0))
 
-
-# Add additional columns from the second photo
-additional_data <- data.frame(
-  Q1.AI_knowledge = c("very well informed", "well informed", "sufficiently informed", "poorly informed", "very poorly informed/uninformed"),
-  Male_Additional = c(4.3, 23.6, 41.3, 27.0, 3.8),
-  Female_Additional = c(0.8, 11.2, 31.9, 41.7, 14.4),
-  Total_Additional = c(2.4, 16.8, 36.1, 35.1, 9.6)
-)
-
-# Merge the tables
-final_table <- pivot_table %>%
-  left_join(additional_data, by = "Q1.AI_knowledge")
-
-
-final_table <- final_table %>%
-  mutate(across(where(is.numeric), ~ paste0(round(.x, 1), "%")))
-
-# Format the table for display
-final_table %>% 
-  select(Q1.AI_knowledge, F, M,, Male_Additional, Female_Additional, Total_Additional) %>%
-  rename("AI Knowledge Level" = Q1.AI_knowledge, "Female (%)" = F, "Male (%)" = M, "Male (Paper)" = Male_Additional, "Female (Paper)" = Female_Additional, "Total (Paper)" = Total_Additional) %>%
-  kable(format = "markdown", col.names = c("AI Knowledge Level", "Female (%)", "Male (%)", "Female (Paper)", "Male (Paper)", "Total (Paper)")) %>%
-  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
-```
-</details>
-
-
-```{r, echo=TRUE,warning=FALSE,message=FALSE,error=FALSE}
+# Summarize the data by gender and agreement level
 table_data2 <- data3 %>%
   group_by(Q12.Gender, Q3.2.Job_replacement) %>%
   summarise(Count = n()) %>%
   mutate(Percentage = Count / sum(Count) * 100) %>%
   arrange(Q12.Gender, Q3.2.Job_replacement)
 
+
+# Pivot for a side-by-side comparison
 pivot_table2 <- table_data2 %>%
   select(-Count) %>%
   pivot_wider(names_from = Q12.Gender, values_from = Percentage, values_fill = list(Percentage = 0))
 
 pivot_table2 <- pivot_table2 %>%
   mutate(across(where(is.numeric), ~ paste0(round(.x, 1), "%")))
+```
+</details>
 
+```{r}
+# Display the table
 pivot_table2 %>% 
   kable( format = "markdown", col.names = c("Replacing the humans and jobs by gender", "Female (%)", "Male (%)")) %>% 
   kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
 ```
 
+### Comparing the two data sets, we see that:
+
+-  Students in 2022 are less willing to fully commit to one side of the argument about AI replacing jobs. There's a general trend towards more neutral and partially agreeing positions, especially among females.
+-  The increase in the "Partially Agree" category among females suggests a growing complexity in how job replacement by AI is viewed, possibly reflecting broader societal and economic discussions about AI.
+
+
+
+# 13. Comparative Analysis of Perceptions on AI as a Threat to Humanity by Gender
+
+This section examines the differences in perceptions about whether AI could rule society or destroy humanity, comparing our current study results with historical data to see how these views have evolved over time.
+
+### Overview of Previous Study Findings
+
+The previous study showed a notable gender difference in the perception of AI's threat:
+
+- **Females** expressed higher concern with 15.5% perceiving a very high threat and 29.5% a high threat.
+- **Males** were less concerned, with only 8.4% perceiving a very high threat and 22.7% a high threat.
+
+These results suggest a higher level of apprehension among females regarding the potential dangers of AI.
+
+### Current Study Results
+
+Our study indicates a shift in these perceptions:
+
+- **Very Low Threat**: More females (30.5%) now perceive a very low threat compared to males (31.2%).
+- **High Threat**: Fewer females now see AI as a high threat (8.5%) compared to males (18.8%).
+
+The table below details these distributions:
+
+<details>
+<summary>Click here to view the code and generated table</summary>
+
 ```{r, echo=TRUE,warning=FALSE,message=FALSE,error=FALSE}
+library(knitr)
+library(kableExtra)
+
+# Summarize the data by gender and perception level
 table_data3 <- data3 %>%
   group_by(Q12.Gender, Q3.4.AI_rulling_society) %>%
   summarise(Count = n()) %>%
   mutate(Percentage = Count / sum(Count) * 100) %>%
   arrange(Q12.Gender, Q3.4.AI_rulling_society)
 
+# Pivot for a side-by-side comparison
 pivot_table3 <- table_data3 %>%
   select(-Count) %>%
   pivot_wider(names_from = Q12.Gender, values_from = Percentage, values_fill = list(Percentage = 0))
@@ -713,35 +700,85 @@ pivot_table3 <- table_data3 %>%
 pivot_table3 <- pivot_table3 %>%
   mutate(across(where(is.numeric), ~ paste0(round(.x, 1), "%")))
 
+
+```
+</details> 
+
+### Discussion
+- **Decrease in Perceived Threat**: The data from 2022 indicate a general decrease in the perception of AI as a severe threat to humanity, especially among females.
+- **Gender Differences**: While both genders show a reduction in concern, males still report higher levels of concern compared to females, reversing the trend seen in previous data.
+
+This comparative analysis highlights how societal attitudes towards AI and its potential risks are changing, possibly reflecting increased familiarity and integration of AI technologies in daily life.
+
+```{r}
+# Display the table
 pivot_table3 %>% 
-  kable( format = "markdown", col.names = c("AI will rull society/destroy humanity", "Female (%)", "Male (%)")) %>% 
+  kable(format = "markdown", col.names = c("AI will rule society/destroy humanity", "Female (%)", "Male (%)")) %>% 
   kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
 ```
+# 14. Comparative Analysis of Overall Attitudes Towards AI and Its Consequences
+
+This section examines how attitudes towards the positive impacts of AI on society differ by gender and compares current study results with those from historical data.
+
+## Overview of Previous Study Findings
+
+In the previous study, attitudes towards AI's potential to positively impact society showed:
+
+- **Males** were significantly more optimistic with 66.8% believing in a positive influence of AI.
+- **Females** were less optimistic with only 51.5% sharing that belief.
+
+This data suggests that males tend to view AI development more favorably than females.
+
+## Current Study Results
+
+Our current study presents a shift in these attitudes:
+
+- **Highly Positive** views are less common in the current data, with only 1.7% of females and 12.5% of males seeing AI's impact as 'Very high'.
+- **Neutral to Negative** views are more prevalent, especially among females, with 30.5% viewing the impact as 'Very low'.
+
+The table below details these distributions:
+
+<details>
+<summary>Click here to view the code and generated table</summary>
+
 
 ```{r, echo=TRUE,warning=FALSE,message=FALSE,error=FALSE}
+# Summarize the data by gender and views on AI's problem-solving capabilities
 table_data4 <- data3 %>%
   group_by(Q12.Gender, Q3.3.Problem_solving) %>%
   summarise(Count = n()) %>%
   mutate(Percentage = Count / sum(Count) * 100) %>%
   arrange(Q12.Gender, Q3.3.Problem_solving)
-
+# Pivot for a side-by-side comparison
 pivot_table4 <- table_data4 %>%
   select(-Count) %>%
   pivot_wider(names_from = Q12.Gender, values_from = Percentage, values_fill = list(Percentage = 0))
-
+# Pivot for a side-by-side comparison
 pivot_table4 <- pivot_table4 %>%
   mutate(across(where(is.numeric), ~ paste0(round(.x, 1), "%")))
 
+
+```
+</details> 
+
+```{r}
+
+# Display the table
 pivot_table3 %>% 
   kable( format = "markdown", col.names = c("AI helps to solve many problems in society", "Female (%)", "Male (%)")) %>% 
   kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
 ```
+### Discussion
+- **Decrease in Optimism:** Students in 2022 are less optimistic about AI having a positive influence on society compared to previous years. This trend is more pronounced among females.
+- **Gender Differences:** While both genders show less optimism, the decline is steeper among females, suggesting that experiences or perceptions of AI's societal impact may differ significantly by gender.
 
-## Tests
+
+
+# 15 Tests
 
 Hypothesis 2 (H2). Male students have a different level of information regarding AI use than female students.
 
-# Levene's test for Equality of variances
+## 15.1 Levene's test for Equality of variances
 ```{r}
 data$Q12.Gender <- as.factor(data$Q12.Gender)
 levene <- leveneTest(Q1.AI_knowledge ~ Q12.Gender, data = data)
@@ -749,7 +786,7 @@ levene_f <- levene$`F value`[1]
 levene_p <- levene$`Pr(>F)`[1]
 ```
 
-# t-Test for equality of means
+## 15.2 t-Test for equality of means
 ```{r}
 t_test_equal_var <- t.test(Q1.AI_knowledge ~ Q12.Gender, data = data, var.equal = TRUE)
 t_equal <- t_test_equal_var$statistic
